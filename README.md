@@ -61,6 +61,7 @@ SKILL.md                     技能入口
 agents/openai.yaml           技能展示信息
 references/capabilities.md   宏接口与字段契约
 references/questions.json    各题型输入示例
+references/troubleshooting.md WorkBuddy 权限错误排查
 scripts/create_deck.py       新建题目课件
 scripts/inspect_deck.py      读取课件文字与标签
 ```

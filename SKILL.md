@@ -25,6 +25,7 @@ end tell
 - 从题目 JSON 新建课件或制作小样，可运行 `python3 <技能目录>/scripts/create_deck.py <题目.json> <新课件.pptx>`。[样例 JSON](references/questions.json) 包含各支持题型。
 - 检查已有课件，运行 `python3 <技能目录>/scripts/inspect_deck.py <课件.pptx>`。它输出每页文字与雨课堂标签，不依赖 PowerPoint。
 - 修改既有课件，按参考文档调用 `Message.EditProblem` 定位题目，再调用相应编辑宏。
+- 在 WorkBuddy 中调用 PowerPoint 报权限错误时，阅读 [故障排查](references/troubleshooting.md)。
 
 ## 执行要点
 
