@@ -1,0 +1,4 @@
+interface:
+  display_name: "雨课堂互动课件"
+  short_description: "配合通用 PPT 制作技能，为课件添加雨课堂原生互动功能"
+  default_prompt: "使用 $rainclassroom-ppt 为我的 PowerPoint 添加原生雨课堂习题、投票和互动入口。"

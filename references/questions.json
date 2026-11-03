@@ -1,0 +1,134 @@
+[
+  {
+    "ProblemType": 1,
+    "Body": "哪一个是演示文稿编辑软件？",
+    "Options": [
+      {
+        "key": "A",
+        "value": "PowerPoint"
+      },
+      {
+        "key": "B",
+        "value": "雨课堂"
+      },
+      {
+        "key": "C",
+        "value": "图片查看器"
+      },
+      {
+        "key": "D",
+        "value": "文本编辑器"
+      }
+    ],
+    "Answer": [
+      "A"
+    ],
+    "Score": 2,
+    "HasRemark": true,
+    "Remark": "PowerPoint 是演示文稿编辑软件。"
+  },
+  {
+    "ProblemType": 2,
+    "Body": "哪些属于本次课件制作工具？",
+    "Options": [
+      {
+        "key": "A",
+        "value": "PowerPoint"
+      },
+      {
+        "key": "B",
+        "value": "雨课堂"
+      },
+      {
+        "key": "C",
+        "value": "图片查看器"
+      },
+      {
+        "key": "D",
+        "value": "文本编辑器"
+      }
+    ],
+    "Answer": [
+      "A",
+      "B"
+    ],
+    "Score": 4,
+    "HalfScore": 1
+  },
+  {
+    "ProblemType": 3,
+    "Body": "选择你希望学习的工具，最多两项。",
+    "Options": [
+      {
+        "key": "A",
+        "value": "PowerPoint"
+      },
+      {
+        "key": "B",
+        "value": "雨课堂"
+      },
+      {
+        "key": "C",
+        "value": "图片查看器"
+      },
+      {
+        "key": "D",
+        "value": "文本编辑器"
+      }
+    ],
+    "PollingCount": 2,
+    "Anonymous": false
+  },
+  {
+    "ProblemType": 4,
+    "Body": "常用演示文稿软件是#填空1#，本次互动插件是#填空2#。",
+    "Score": 4,
+    "BlankKeyWord": "填空",
+    "BlankDelimiter": "#",
+    "Blanks": [
+      {
+        "Num": 1,
+        "Score": 2,
+        "Answers": [
+          "PowerPoint",
+          "PPT"
+        ],
+        "CaseSensitive": false,
+        "FuzzyMatch": false
+      },
+      {
+        "Num": 2,
+        "Score": 2,
+        "Answers": [
+          "雨课堂"
+        ],
+        "CaseSensitive": false,
+        "FuzzyMatch": false
+      }
+    ],
+    "OrderInsensitive": false
+  },
+  {
+    "ProblemType": 5,
+    "Body": "说明课堂投票与知识测验的不同用途。",
+    "Score": 5,
+    "Answer": [
+      "投票收集观点，测验检查理解。"
+    ],
+    "HasRemark": true,
+    "Remark": "结合教学目标选择互动方式。"
+  },
+  {
+    "ProblemType": 6,
+    "Body": "雨课堂题目的答案配置可以随 PPTX 保存。",
+    "Options": [],
+    "Answer": [
+      "A"
+    ],
+    "Score": 1
+  },
+  {
+    "ProblemType": 0,
+    "Body": "课堂互动：问题、反馈与讲评。"
+  }
+]
