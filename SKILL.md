@@ -17,16 +17,24 @@ description: 当用户明确要求制作包含雨课堂插件功能的 PPT 时�
 python3 scripts/insert_questions.py "基础稿.pptx" "插题清单.json" "交付稿.pptx"
 ```
 
-按[插题清单示例](references/insertion-plan.json)填写。每项的 `after` 指原稿页码，从 1 开始。同一页后的多道题按清单顺序插入。支持 PowerPoint 标准宽屏（13⅓ × 7½ 英寸），每题四个选项。
+基础稿使用 PowerPoint 标准宽屏（13⅓ × 7½ 英寸）。题页用 `after` 指定在哪个原稿页后新增，页内按钮用 `on` 指定放在哪个原稿页上。页码从 1 开始，同一页后的题目按清单顺序排列。[完整清单示例](references/full-plan.json)
 
-- `choice` 插入 2 分单选题，`answer` 为 A 到 D 中的一个，`remark` 为可选解析。
-- `poll` 插入匿名投票，`limit` 为最多可选项数（1 到 4）。
+| `kind` | 内容及字段 |
+|---|---|
+| `choice`、`multi` | 题干 `body` 和四个 `options`。单选 `answer` 为一个字母，多选为字母数组，可用 `halfScore` 设置少选得分。 |
+| `poll` | 四选项匿名投票，`limit` 为最多可选项数（1–4）。 |
+| `blank` | 在 `body` 中按顺序写 `[填空1]` 等占位。每个 `blanks` 条目含 `answers`、`score`，可设 `caseSensitive`、`fuzzyMatch`。整题可设 `orderInsensitive`。 |
+| `short`、`judge` | 主观题填题干，判断题另填布尔值 `answer`，插件中以“对／错”两个选项呈现。 |
+| `info` | `body` 为信息页正文。 |
+| `danmu`、`submission`、`rollcall`、`quickanswer` | 分别为弹幕、投稿、点名、抢答。可用 `label` 设置文字，`box` 设置 [左、上、宽、高]，单位为磅。默认按类型分布在页底四个位置；同页多个同类按钮用不同 `box` 定位。 |
+
+单选、多选、主观和判断题均可设置整数 `score` 和文本 `remark`，默认分别为 2、4、5、1 分。填空总分由各空分值相加。
 
 保存后用 `scripts/inspect_deck.py` 对照清单核对页序、文字和标签。
 
 ### 通过雨课堂插件创建和编辑（macOS）
 
-其他题型、题目编辑和页内互动使用已加载雨课堂插件的桌面版 PowerPoint。主要插题宏是 `Message.InsertProb`。
+需要在 PowerPoint 中新建课件或编辑已有题目时，使用已加载雨课堂插件的 Mac 桌面版。主要插题宏是 `Message.InsertProb`。
 
 ```applescript
 tell application "Microsoft PowerPoint"

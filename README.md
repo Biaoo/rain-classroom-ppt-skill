@@ -7,8 +7,8 @@
 | 能力 | Windows 和 macOS 文件脚本 | macOS PowerPoint 插件 |
 |---|---|---|
 | 在已有课件插入单选、投票 | 四选项单选题、四选项匿名投票 | 单选和投票，支持调整分值、匿名状态、可选数等 |
-| 多选、填空、主观、判断、信息页 | — | `Message.InsertProb` |
-| 在当前页添加弹幕、投稿、点名、抢答 | — | `Message.InsertInteraction` |
+| 多选、填空、主观、判断、信息页 | 支持全部五类 | `Message.InsertProb` |
+| 在当前页添加弹幕、投稿、点名、抢答 | 按原稿页码添加原生按钮 | `Message.InsertInteraction` |
 | 重新解析及编辑已有题目 | — | `Message.EditProblem` 和对应编辑宏 |
 | 检查保存后的文字和原生标签 | `inspect_deck.py` | 可用编辑面板确认插件识别 |
 
@@ -33,10 +33,10 @@ npx skills add Biaoo/rain-classroom-ppt-skill
 ### 在已有课件中插题（Windows 和 macOS）
 
 ```bash
-python3 scripts/insert_questions.py "基础稿.pptx" references/insertion-plan.json "交付稿.pptx"
+python3 scripts/insert_questions.py "基础稿.pptx" references/full-plan.json "交付稿.pptx"
 ```
 
-Windows 如使用 Python 启动器，将 `python3` 换为 `py -3`。标准库即可完成生成。基础稿使用 PowerPoint 标准宽屏尺寸（13⅓ × 7½ 英寸）。清单可包含任意组合的四选项单选题（2 分，可附解析）与四选项匿名投票（最多可选 1 到 4 项）。`after` 按原稿页码定位，同一页后的题目按清单顺序排列。输出指定新的文件名。
+Windows 如使用 Python 启动器，将 `python3` 换为 `py -3`。标准库即可完成生成。基础稿使用 PowerPoint 标准宽屏尺寸（13⅓ × 7½ 英寸）。按原稿页码定位，`after` 在该页之后插入题页或信息页，`on` 将互动按钮添加到该页。字段说明见 [SKILL.md](SKILL.md)，示例见[完整清单](references/full-plan.json)。输出指定新的文件名。
 
 ### 从题目 JSON 新建课件（macOS）
 
@@ -75,6 +75,7 @@ references/capabilities.md   宏接口与字段契约
 references/questions.json    各题型输入示例
 references/troubleshooting.md WorkBuddy 权限与 PowerPoint 无响应排查
 references/insertion-plan.json  跨平台插题清单示例
+references/full-plan.json    七种页面与四种页内按钮示例
 assets/native-pages.zip      雨课堂原生题页模板
 scripts/insert_questions.py  向已有标准宽屏 PPTX 插题
 scripts/create_deck.py       通过 Mac 插件新建题目课件

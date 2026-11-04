@@ -1,0 +1,13 @@
+[
+  {"kind":"choice","after":1,"body":"活性污泥法依赖哪一类生物？","options":["藻类","微生物群落","鱼类","水草"],"answer":"B"},
+  {"kind":"multi","after":1,"body":"哪些环节利用生物处理？","options":["活性污泥","格栅","生物膜","沉砂"],"answer":["A","C"],"score":6,"halfScore":2},
+  {"kind":"poll","after":1,"body":"你希望复习哪些环节？","options":["预处理","曝气","沉淀","消毒"],"limit":2},
+  {"kind":"blank","after":2,"body":"曝气向水中提供[填空1]；沉淀通常依靠[填空2]。","blanks":[{"answers":["氧气","氧"],"score":2},{"answers":["重力"],"score":3}]},
+  {"kind":"short","after":2,"body":"解释曝气池的作用。","score":8,"remark":"供氧并混合污水和污泥。"},
+  {"kind":"judge","after":2,"body":"格栅可以去除所有溶解性有机物。","answer":false,"score":3},
+  {"kind":"info","after":2,"body":"本节回顾：预处理、生物处理、沉淀与消毒。"},
+  {"kind":"danmu","on":3,"label":"弹幕"},
+  {"kind":"submission","on":3,"label":"投稿"},
+  {"kind":"rollcall","on":3,"label":"点名"},
+  {"kind":"quickanswer","on":3,"label":"抢答"}
+]

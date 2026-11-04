@@ -23,8 +23,14 @@ jobs:
         run: python3 -X utf8 scripts/insert_questions.py tests/fixtures/base.pptx references/insertion-plan.json rain-questions.pptx
       - name: Verify questions and original slides
         run: python3 -X utf8 tests/verify_insertion.py tests/fixtures/base.pptx rain-questions.pptx
+      - name: Insert and verify all supported formats
+        run: |
+          python3 -X utf8 scripts/insert_questions.py tests/fixtures/base.pptx references/full-plan.json rain-full.pptx
+          python3 -X utf8 tests/verify_full_plan.py tests/fixtures/base.pptx rain-full.pptx
       - uses: actions/upload-artifact@v7.0.2
         with:
           name: rain-questions-${{ matrix.os }}
-          path: rain-questions.pptx
+          path: |
+            rain-questions.pptx
+            rain-full.pptx
           if-no-files-found: error
