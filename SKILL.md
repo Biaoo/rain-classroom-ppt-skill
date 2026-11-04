@@ -5,11 +5,14 @@ description: 当用户明确要求制作包含雨课堂插件功能的 PPT 时�
 
 # 雨课堂互动课件
 
-通用 PPT skill 负责内容组织与版式，本技能负责雨课堂原生习题、投票和互动对象。沿用通用 skill 生成的课件，在主要排版完成后通过脚本调用雨课堂插件插入互动内容；交付以保存后仍能被雨课堂识别为准。
+先用通用 PPT skill 完成内容、页序和排版，保存为基础稿。再在基础稿的副本中插入雨课堂原生习题、投票和互动对象，保存为交付稿。
 
 ## 入口与用法
 
-主要宏入口是 `Message.InsertProb`。本技能提供的脚本与以下调用示例使用 macOS PowerPoint 的 AppleScript 接口；其他平台需使用对应的自动化接口并核对宏契约。
+先按平台选择入口：
+
+- **macOS**：创建脚本 `scripts/create_deck.py` 和下文的插入、编辑示例使用桌面版 PowerPoint、AppleScript 和已加载的雨课堂插件。主要插题宏是 `Message.InsertProb`。
+- **Windows**：可用 Python 3 运行 `scripts/inspect_deck.py` 检查已保存的课件。本技能尚未提供适用于 Windows 的原生插题脚本。
 
 ```applescript
 tell application "Microsoft PowerPoint"
@@ -32,8 +35,8 @@ end tell
 1. 从当前 PowerPoint 查询实际加载的雨课堂插件及其位置，检查客户端连接。发现方法、实测版本和接口适配方法见参考文档第 6 节。
 2. 调用前确认活动文稿完整路径和目标页。另存为后按新名称重新获取文稿引用；向前插页后重新定位后续目标，避免页码偏移。
 3. 用 JSON 序列化和 AppleScript 字符串转义传参，执行脚本文件或通过标准输入传给 `osascript`。
-4. 宏可能吞掉内部错误。插入后核对页数、题干、选项及配置；中断后先检查实际结果，避免重复插题。
-5. 保存并重开，使用 `Message.EditProblem` 让插件重新解析；结合标签检查和必要的界面查看验收。视觉操作用于脚本无法覆盖的环节和显示核验。
+4. 插入题目后核对页数是否增加一页，在原页添加互动入口后核对该页是否新增一个形状。不要用 AppleScript 遍历整页形状并逐个读取文本，这样做有导致 PowerPoint 无响应的风险。若检查卡住，见[遍历形状时无响应](references/troubleshooting.md#遍历形状时无响应)。
+5. 保存交付稿，再用 `scripts/inspect_deck.py` 对照预期目标页逐项核对题干、选项及配置标签。投票核对匿名状态和可选上限，互动入口核对所在页及 `INTERACTIONTYPE`。需要确认插件识别时，重开课件，在目标题页调用 `Message.EditProblem` 让插件重新解析。
 
 创建脚本使用 Python 标准库和已安装的本机应用。宏操作当前活动文稿，执行期间保持目标文稿处于活动状态。
 

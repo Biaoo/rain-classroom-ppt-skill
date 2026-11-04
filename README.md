@@ -4,6 +4,8 @@
 
 通用 PPT skill 负责内容组织与版式，本技能通过雨课堂插件宏创建原生对象，并检查保存后的题目配置与标签。
 
+**平台支持**：macOS 提供 PowerPoint 原生插题脚本。Windows 可用 Python 3 检查已保存的 PPTX，目前没有 Windows 原生插题脚本。
+
 ## 能力
 
 - 创建单选、多选、投票、填空、主观、判断题及信息页。
@@ -32,7 +34,7 @@ npx skills add Biaoo/rain-classroom-ppt-skill
 
 现有创建脚本使用 macOS PowerPoint 的 AppleScript 接口。运行时需已安装 PowerPoint 和雨课堂、加载 `RainClassroom.ppam` 并连接客户端。插件位置通过 PowerPoint 查询。
 
-### 从题目 JSON 新建课件
+### 从题目 JSON 新建课件（macOS）
 
 ```bash
 python3 scripts/create_deck.py references/questions.json /absolute/path/new-lesson.pptx
@@ -48,7 +50,11 @@ python3 scripts/create_deck.py references/questions.json /absolute/path/new-less
 python3 scripts/inspect_deck.py /absolute/path/lesson.pptx
 ```
 
-检查脚本使用 Python 标准库读取 PPTX，可独立于 PowerPoint 运行。
+检查脚本使用 Python 3 标准库读取 PPTX，可独立于 PowerPoint 运行。在装有 Python 启动器的 Windows 环境中，从技能目录运行：
+
+```powershell
+py -3 scripts/inspect_deck.py "课件.pptx"
+```
 
 ## 验证
 
@@ -61,7 +67,7 @@ SKILL.md                     技能入口
 agents/openai.yaml           技能展示信息
 references/capabilities.md   宏接口与字段契约
 references/questions.json    各题型输入示例
-references/troubleshooting.md WorkBuddy 权限错误排查
+references/troubleshooting.md WorkBuddy 权限与 PowerPoint 无响应排查
 scripts/create_deck.py       新建题目课件
 scripts/inspect_deck.py      读取课件文字与标签
 ```
