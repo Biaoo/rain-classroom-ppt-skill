@@ -182,7 +182,9 @@ end tell
 
 信息页的原生初始文本框可能过窄；创建脚本会按页面宽度调整，并给定初始高度，后续可根据正文长度继续排版。
 
-`scripts/create_deck.py` 是 macOS 上新建题目课件或小样的辅助脚本，接收题目 JSON 和新的输出路径，处理插题、保存后重新取引用、关闭重开及页数/题型检查。输出包含课件结构、PowerPoint 版本和已加载插件路径，便于对照输入核对答案及配置。在已有标准宽屏课件上插入本页列出的七种页面及四类通用互动时，Windows 和 macOS 可使用 `scripts/insert_questions.py` 和[完整清单](full-plan.json)。
+在 Windows 或 macOS 上为已有标准宽屏课件插题或添加互动按钮，使用 `scripts/insert_questions.py`。[完整清单示例](full-plan.json)
+
+在 macOS 上从题目 JSON 新建课件，使用 `scripts/create_deck.py`。脚本保存并重新打开课件，核对页数和题型。
 
 `scripts/inspect_deck.py` 沿 PPTX 中实际的关系引用读取每页及形状标签。关键字段：
 
@@ -214,7 +216,7 @@ end tell
 
 返回两行：PowerPoint 版本、插件完整路径。查询不到加载项时，检查 PowerPoint 加载项列表与客户端连接。`RainClassroom.ppam!Message.InsertProb` 中的文件名用于解析已加载宏。
 
-上述接口在 macOS、PowerPoint 16.114.3、雨课堂 7.1.2 上完成了生成或修改、保存重开和原生标签核对，验证覆盖本地课件制作与配置。适配其他版本时，用小样核对题型、配置及重开后的插件识别结果。
+本节宏接口对应 Mac 版 PowerPoint 16.114.3 和雨课堂 7.1.2。
 
 需要适配宏契约时，读取查询得到的插件文件；如受应用沙箱限制无法读取，可通过系统应用定位找到当前雨课堂客户端，在实际应用资源中查找同名插件，并核对其与已加载版本的对应关系。安装目录名可能沿用旧版本，版本信息应来自客户端自身或应用元数据。
 

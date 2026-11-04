@@ -21,5 +21,3 @@ osascript -e 'tell application "Microsoft PowerPoint" to count presentations'
 ```
 
 返回文稿数量且退出码为 `0`，说明 PowerPoint 查询已成功，可继续运行雨课堂脚本。
-
-已在 WorkBuddy 5.9.3、PowerPoint 16.114.3 上验证：相同查询在沙箱开启时返回 `-10004`，关闭后返回 `1`、退出码为 `0`，无需重新配置 macOS 自动化权限。此结果验证的是 PowerPoint 通信，课件仍按技能中的流程验收。

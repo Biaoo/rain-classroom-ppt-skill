@@ -47,14 +47,14 @@ end tell
 
 - 查题型、投票字段、编辑接口和例子时，阅读 [能力与调用契约](references/capabilities.md)。
 - 在已有幻灯片添加弹幕、投稿、点名或抢答，使用 `Message.InsertInteraction`；其参数、原生标签和完整脚本见参考文档第 4 节。它添加当前页的互动对象，不新增题目页。
-- 从题目 JSON 新建课件或制作小样，可运行 `python3 <技能目录>/scripts/create_deck.py <题目.json> <新课件.pptx>`。[样例 JSON](references/questions.json) 包含各支持题型。
+- 在 macOS 上从题目 JSON 新建雨课堂课件，运行 `python3 <技能目录>/scripts/create_deck.py <题目.json> <新课件.pptx>`。[样例 JSON](references/questions.json) 包含各支持题型。
 - 检查已有课件，运行 `python3 <技能目录>/scripts/inspect_deck.py <课件.pptx>`。它输出每页文字与雨课堂标签，不依赖 PowerPoint。
 - 修改既有课件，按参考文档调用 `Message.EditProblem` 定位题目，再调用相应编辑宏。
 - 在 WorkBuddy 中调用 PowerPoint 报权限错误时，阅读 [故障排查](references/troubleshooting.md)。
 
 ## 插件宏的执行要点
 
-1. 从当前 PowerPoint 查询实际加载的雨课堂插件及其位置，检查客户端连接。发现方法、实测版本和接口适配方法见参考文档第 6 节。
+1. 从当前 PowerPoint 查询实际加载的雨课堂插件及其位置，检查客户端连接。插件定位方法、接口版本和适配说明见参考文档第 6 节。
 2. 调用前确认活动文稿完整路径和目标页。另存为后按新名称重新获取文稿引用；向前插页后重新定位后续目标，避免页码偏移。
 3. 用 JSON 序列化和 AppleScript 字符串转义传参，执行脚本文件或通过标准输入传给 `osascript`。
 4. 插入题目后核对页数是否增加一页，在原页添加互动入口后核对该页是否新增一个形状。不要用 AppleScript 遍历整页形状并逐个读取文本，这样做有导致 PowerPoint 无响应的风险。若检查卡住，见[遍历形状时无响应](references/troubleshooting.md#遍历形状时无响应)。

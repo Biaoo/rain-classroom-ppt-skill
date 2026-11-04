@@ -30,11 +30,13 @@ npx skills add Biaoo/rain-classroom-ppt-skill
 
 > 使用 $rainclassroom-ppt，在这份课件中添加一道原生单选题和一道匿名投票，保留已有版式。
 
-### 在已有课件中插题（Windows 和 macOS）
+### 在已有课件中插题或添加互动按钮（Windows 和 macOS）
 
 ```bash
 python3 scripts/insert_questions.py "基础稿.pptx" references/full-plan.json "交付稿.pptx"
 ```
+
+`scripts/insert_questions.py` 支持 Windows 和 macOS。[双平台 CI](https://github.com/Biaoo/rain-classroom-ppt-skill/actions/workflows/insert-questions.yml)
 
 Windows 如使用 Python 启动器，将 `python3` 换为 `py -3`。标准库即可完成生成。基础稿使用 PowerPoint 标准宽屏尺寸（13⅓ × 7½ 英寸）。按原稿页码定位，`after` 在该页之后插入题页或信息页，`on` 将互动按钮添加到该页。字段说明见 [SKILL.md](SKILL.md)，示例见[完整清单](references/full-plan.json)。输出指定新的文件名。
 
@@ -46,7 +48,7 @@ python3 scripts/create_deck.py references/questions.json /absolute/path/new-less
 
 输入为题目 JSON 数组，输出路径所在目录需已存在，文件名使用新的 `.pptx` 路径。脚本完成插题、保存重开及页数和题型检查，并输出结构化结果。
 
-为已有课件增加互动时，按参考文档定位文稿和目标页，调用 `Message.InsertProb`、`Message.EditProblem` 或 `Message.InsertInteraction`。
+在 Mac PowerPoint 中编辑已有题目时，用 `Message.EditProblem` 定位题目，再调用对应的[编辑宏](references/capabilities.md)。
 
 ### 检查课件
 
@@ -59,12 +61,6 @@ python3 scripts/inspect_deck.py /absolute/path/lesson.pptx
 ```powershell
 py -3 scripts/inspect_deck.py "课件.pptx"
 ```
-
-## 验证
-
-Windows 和 macOS CI 使用同一插题脚本，核对新增页位置、原页内容、正确答案、投票配置及文件引用。插件识别验证使用 Mac 版雨课堂。
-
-已在 macOS、PowerPoint 16.114.3、雨课堂 7.1.2 上完成原生题目及互动对象的生成或修改、保存重开和标签核对。验证覆盖本地课件制作与配置。
 
 ## 文件结构
 
