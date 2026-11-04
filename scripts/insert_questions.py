@@ -1,7 +1,8 @@
-"""在已有宽屏 PPTX 的指定原稿页后各插入一道四选项单选题和匿名投票。"""
+"""在已有宽屏 PPTX 的指定原稿页后插入四选项单选题或匿名投票。"""
 import argparse
 import json
 import posixpath
+import uuid
 from pathlib import Path
 from xml.dom import minidom as dom
 from xml.etree import ElementTree as ET
@@ -12,7 +13,7 @@ R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships"
 PKG = "http://schemas.openxmlformats.org/package/2006/relationships"
 NS = {"p": P, "a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
 CONTENT = "application/vnd.openxmlformats-officedocument.presentationml."
-FIXTURES = Path(__file__).parent / "fixtures"
+TEMPLATES = Path(__file__).resolve().parents[1] / "assets" / "native-pages.zip"
 
 
 def xml(element):
@@ -37,17 +38,19 @@ def allocate(parts, folder, stem, extension):
 def customize(template, tags, q):
     kind = q["kind"]
     labels = q["options"]
-    if len(labels) != 4 or not all(isinstance(x, str) and x.strip() for x in [q["body"], *labels]):
-        raise ValueError("每道题需要题干和四个非空选项")
     slide_tags = tags["rId1"]
     if kind == "choice":
-        if q["answer"] not in list("ABCD"):
-            raise ValueError("单选答案须为 A、B、C 或 D")
-        slide_tags["PROBLEMREMARK"] = q["remark"]
+        remark = q.get("remark", "")
+        slide_tags["PROBLEMHASREMARK"] = str(bool(remark))
+        slide_tags["PROBLEMREMARK"] = remark
     else:
-        if not 1 <= q["limit"] <= 4:
-            raise ValueError("投票上限须为 1 到 4")
         slide_tags["ANONYMOUSPOLLING"] = "True"
+    for node in template.iter():
+        if node.tag.endswith("}creationId"):
+            if "id" in node.attrib:
+                node.set("id", "{" + str(uuid.uuid4()).upper() + "}")
+            elif "val" in node.attrib:
+                node.set("val", str(uuid.uuid4().int & 0xffffffff))
     items = iter(labels)
     for shape in template.findall(".//p:sp", NS):
         ref = shape.find("p:nvSpPr/p:nvPr/p:custDataLst/p:tags", NS)
@@ -66,6 +69,9 @@ def customize(template, tags, q):
             correct = original == q["answer"]
             meta["RAINBULLET"] = "Correct" if correct else "Wrong"
             shape.find("p:spPr/a:solidFill/a:srgbClr", NS).set("val", "00FF00" if correct else "808080")
+        elif role == "ProblemBullet" and kind == "poll":
+            geom = shape.find("p:spPr/a:prstGeom", NS)
+            geom.set("prst", "ellipse" if q["limit"] == 1 else "rect")
         elif role == "PollingAnswer":
             replacement = f"最多可选{q['limit']}项"
         elif kind == "poll" and original == "投票":
@@ -77,6 +83,10 @@ def customize(template, tags, q):
 
 
 def insert(base, plan, output):
+    if base.suffix.lower() != ".pptx" or output.suffix.lower() != ".pptx":
+        raise ValueError("输入和输出均须为 .pptx 文件")
+    if output.exists():
+        raise FileExistsError(f"请指定新的输出文件：{output}")
     with ZipFile(base) as source:
         parts = {name: source.read(name) for name in source.namelist()}
     presentation = dom.parseString(parts["ppt/presentation.xml"])
@@ -84,22 +94,38 @@ def insert(base, plan, output):
     types = dom.parseString(parts["[Content_Types].xml"])
     size = presentation.getElementsByTagNameNS(P, "sldSz")[0]
     if (size.getAttribute("cx"), size.getAttribute("cy")) != ("12192000", "6858000"):
-        raise ValueError("原型使用 13⅓ × 7½ 英寸的原生题页")
+        raise ValueError("题页模板使用 13⅓ × 7½ 英寸的原生题页")
     order = presentation.getElementsByTagNameNS(P, "sldIdLst")[0]
     originals = list(order.getElementsByTagNameNS(P, "sldId"))
     mapping = {r.getAttribute("Id"): r.getAttribute("Target") for r in pres_rels.documentElement.childNodes if r.nodeType == r.ELEMENT_NODE}
     slide_id = max(int(s.getAttribute("id")) for s in originals)
-    if sorted(q["kind"] for q in plan) != ["choice", "poll"]:
-        raise ValueError("原型需要一道单选和一道匿名投票")
-    with ZipFile(FIXTURES / "native-pages.zip") as seeds:
+    if not isinstance(plan, list) or not plan:
+        raise ValueError("插题清单须为非空数组")
+    for i, q in enumerate(plan, 1):
+        if not isinstance(q, dict) or q.get("kind") not in ("choice", "poll"):
+            raise ValueError(f"第 {i} 项须指定 choice 或 poll")
+        if type(q.get("after")) is not int or not 1 <= q["after"] <= len(originals):
+            raise ValueError(f"第 {i} 项的 after 须为有效的原稿页码")
+        options = q.get("options")
+        if not isinstance(options, list) or len(options) != 4 or not all(
+            isinstance(x, str) and x.strip() for x in [q.get("body"), *options]
+        ):
+            raise ValueError(f"第 {i} 项需要题干和四个非空选项")
+        if q["kind"] == "choice":
+            if q.get("answer") not in ("A", "B", "C", "D") or not isinstance(q.get("remark", ""), str):
+                raise ValueError(f"第 {i} 项需要 A 到 D 的单个答案，解析须为文本")
+        elif type(q.get("limit")) is not int or not 1 <= q["limit"] <= 4:
+            raise ValueError(f"第 {i} 项的投票上限须为 1 到 4 的整数")
+        allowed = {"kind", "after", "body", "options"} | ({"answer", "remark"} if q["kind"] == "choice" else {"limit"})
+        if set(q) - allowed:
+            raise ValueError(f"第 {i} 项包含未支持的字段：{set(q) - allowed}")
+    with ZipFile(TEMPLATES) as seeds:
         image = allocate(parts, "ppt/media", "image", "png")
         parts[image] = seeds.read("marker.png")
         if not any(n.getAttribute("Extension") == "png" for n in types.getElementsByTagName("Default")):
             append(types, types.documentElement, "Override", PartName="/"+image, ContentType="image/png")
         # 逆序插入确保同一锚点上的题目仍按清单顺序出现。
         for i, q in reversed(list(enumerate(plan, 1))):
-            if not 1 <= q["after"] <= len(originals):
-                raise ValueError("原稿页码超出范围")
             anchor = originals[q["after"] - 1]
             target = mapping[anchor.getAttributeNS(R, "id")]
             original_part = posixpath.normpath(posixpath.join("ppt", target)).lstrip("/")
@@ -139,9 +165,15 @@ def insert(base, plan, output):
             order.insertBefore(new, anchor.nextSibling)
     for path, doc in [("ppt/presentation.xml", presentation), ("ppt/_rels/presentation.xml.rels", pres_rels), ("[Content_Types].xml", types)]:
         parts[path] = doc.toxml(encoding="utf-8")
-    with output.open("xb") as stream, ZipFile(stream, "w", ZIP_DEFLATED) as out:
-        for name, data in parts.items():
-            out.writestr(name, data)
+    with output.open("xb") as stream:
+        try:
+            with ZipFile(stream, "w", ZIP_DEFLATED) as out:
+                for name, data in parts.items():
+                    out.writestr(name, data)
+        except BaseException:
+            stream.close()
+            output.unlink()
+            raise
 
 
 if __name__ == "__main__":

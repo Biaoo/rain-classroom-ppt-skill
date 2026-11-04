@@ -182,7 +182,7 @@ end tell
 
 信息页的原生初始文本框可能过窄；创建脚本会按页面宽度调整，并给定初始高度，后续可根据正文长度继续排版。
 
-`scripts/create_deck.py` 是 macOS 上新建题目课件或小样的辅助脚本，接收题目 JSON 和新的输出路径，处理插题、保存后重新取引用、关闭重开及页数/题型检查。输出包含课件结构、PowerPoint 版本和已加载插件路径，便于对照输入核对答案及配置。给已有课件增加互动时直接定位该文稿并调用宏，保留通用 PPT skill 已完成的内容与版式。
+`scripts/create_deck.py` 是 macOS 上新建题目课件或小样的辅助脚本，接收题目 JSON 和新的输出路径，处理插题、保存后重新取引用、关闭重开及页数/题型检查。输出包含课件结构、PowerPoint 版本和已加载插件路径，便于对照输入核对答案及配置。在已有标准宽屏课件上插入四选项单选或匿名投票时，Windows 和 macOS 可用 `scripts/insert_questions.py` 和[插题清单](insertion-plan.json)。其他原生题型及页内互动按本文的 macOS 宏示例定位目标文稿并调用插件。
 
 `scripts/inspect_deck.py` 沿 PPTX 中实际的关系引用读取每页及形状标签。关键字段：
 

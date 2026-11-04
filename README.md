@@ -2,19 +2,17 @@
 
 配合通用 PPT 制作 skill，为 PowerPoint 课件添加雨课堂原生习题、投票和互动入口。
 
-通用 PPT skill 负责内容组织与版式，本技能通过雨课堂插件宏创建原生对象，并检查保存后的题目配置与标签。
+先用通用 PPT skill 完成内容、页序和排版，再用本技能从基础稿生成含雨课堂原生对象的交付稿。
 
-**平台支持**：macOS 提供 PowerPoint 原生插题脚本。Windows 可用 Python 3 检查已保存的 PPTX，目前没有 Windows 原生插题脚本。
+| 能力 | Windows 和 macOS 文件脚本 | macOS PowerPoint 插件 |
+|---|---|---|
+| 在已有课件插入单选、投票 | 四选项单选题、四选项匿名投票 | 单选和投票，支持调整分值、匿名状态、可选数等 |
+| 多选、填空、主观、判断、信息页 | — | `Message.InsertProb` |
+| 在当前页添加弹幕、投稿、点名、抢答 | — | `Message.InsertInteraction` |
+| 重新解析及编辑已有题目 | — | `Message.EditProblem` 和对应编辑宏 |
+| 检查保存后的文字和原生标签 | `inspect_deck.py` | 可用编辑面板确认插件识别 |
 
-## 能力
-
-- 创建单选、多选、投票、填空、主观、判断题及信息页。
-- 设置正确答案、分值、少选得分、解析、投票匿名状态与可选数量。
-- 修改填空题答案及匹配规则、主观题语音作答配置。
-- 在已有幻灯片添加弹幕、投稿、点名、抢答入口。
-- 检查 PPTX 中的题型、文字和雨课堂原生标签。
-
-详细参数和宏入口见 [能力与调用契约](references/capabilities.md)。
+详细字段见[能力与调用契约](references/capabilities.md)。
 
 ## 安装
 
@@ -32,7 +30,13 @@ npx skills add Biaoo/rain-classroom-ppt-skill
 
 > 使用 $rainclassroom-ppt，在这份课件中添加一道原生单选题和一道匿名投票，保留已有版式。
 
-现有创建脚本使用 macOS PowerPoint 的 AppleScript 接口。运行时需已安装 PowerPoint 和雨课堂、加载 `RainClassroom.ppam` 并连接客户端。插件位置通过 PowerPoint 查询。
+### 在已有课件中插题（Windows 和 macOS）
+
+```bash
+python3 scripts/insert_questions.py "基础稿.pptx" references/insertion-plan.json "交付稿.pptx"
+```
+
+Windows 如使用 Python 启动器，将 `python3` 换为 `py -3`。标准库即可完成生成。基础稿使用 PowerPoint 标准宽屏尺寸（13⅓ × 7½ 英寸）。清单可包含任意组合的四选项单选题（2 分，可附解析）与四选项匿名投票（最多可选 1 到 4 项）。`after` 按原稿页码定位，同一页后的题目按清单顺序排列。输出指定新的文件名。
 
 ### 从题目 JSON 新建课件（macOS）
 
@@ -58,6 +62,8 @@ py -3 scripts/inspect_deck.py "课件.pptx"
 
 ## 验证
 
+Windows 和 macOS CI 使用同一插题脚本，核对新增页位置、原页内容、正确答案、投票配置及文件引用。插件识别验证使用 Mac 版雨课堂。
+
 已在 macOS、PowerPoint 16.114.3、雨课堂 7.1.2 上完成原生题目及互动对象的生成或修改、保存重开和标签核对。验证覆盖本地课件制作与配置。
 
 ## 文件结构
@@ -68,6 +74,9 @@ agents/openai.yaml           技能展示信息
 references/capabilities.md   宏接口与字段契约
 references/questions.json    各题型输入示例
 references/troubleshooting.md WorkBuddy 权限与 PowerPoint 无响应排查
-scripts/create_deck.py       新建题目课件
+references/insertion-plan.json  跨平台插题清单示例
+assets/native-pages.zip      雨课堂原生题页模板
+scripts/insert_questions.py  向已有标准宽屏 PPTX 插题
+scripts/create_deck.py       通过 Mac 插件新建题目课件
 scripts/inspect_deck.py      读取课件文字与标签
 ```

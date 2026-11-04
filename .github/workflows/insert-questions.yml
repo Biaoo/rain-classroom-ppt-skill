@@ -1,0 +1,30 @@
+name: Insert Rain Classroom questions
+on:
+  push:
+    branches: [main, integrate/native-insertion]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  insert-and-verify:
+    strategy:
+      matrix:
+        os: [windows-2025, macos-15]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Insert into the existing base deck
+        run: python3 -X utf8 scripts/insert_questions.py tests/fixtures/base.pptx references/insertion-plan.json rain-questions.pptx
+      - name: Verify questions and original slides
+        run: python3 -X utf8 tests/verify_insertion.py tests/fixtures/base.pptx rain-questions.pptx
+      - uses: actions/upload-artifact@v7.0.2
+        with:
+          name: rain-questions-${{ matrix.os }}
+          path: rain-questions.pptx
+          if-no-files-found: error

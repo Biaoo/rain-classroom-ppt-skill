@@ -1,7 +1,10 @@
-"""核对 Windows 生成的交付稿、原稿页序和引用。"""
+"""核对跨平台脚本生成的交付稿、原稿页序和引用。"""
 import hashlib
 import posixpath
 import sys
+import tempfile
+import json
+import subprocess
 from pathlib import Path
 from xml.etree import ElementTree as ET
 from zipfile import ZipFile
@@ -46,3 +49,21 @@ with ZipFile(base) as source, ZipFile(result) as output:
                     assert target in output.namelist(), (path, target)
 print("PASS: original pages, slide order, questions, options, answer B, anonymous poll, limit 2, package relationships")
 print("SHA256", hashlib.sha256(result.read_bytes()).hexdigest())
+
+# 重复使用同一种模板，并在同一个原稿锚点插入多题。
+with tempfile.TemporaryDirectory() as directory:
+    tmp = Path(directory)
+    root = Path(__file__).resolve().parents[1]
+    example = json.loads((root / "references/insertion-plan.json").read_text(encoding="utf-8"))
+    first = dict(example[0], after=2, body="第一题", answer="D")
+    second = dict(first, body="第二题", answer="C")
+    del second["remark"]
+    plan = tmp / "plan.json"
+    plan.write_text(json.dumps([first, second]), encoding="utf-8")
+    edited = tmp / "edited.pptx"
+    subprocess.run([sys.executable, str(root / "scripts/insert_questions.py"), str(base), str(plan), str(edited)], check=True)
+    pages = inspect(edited)["slides"]
+    assert pages[:2] + pages[4:] == originals
+    assert [values(s, "RAINPROBLEM", "ProblemBody") for s in pages[2:4]] == [["第一题"], ["第二题"]]
+    assert [values(s, "RAINBULLET", "Correct") for s in pages[2:4]] == [["D"], ["C"]]
+    assert pages[3]["tags"]["PROBLEMHASREMARK"] == "False"

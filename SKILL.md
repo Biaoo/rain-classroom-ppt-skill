@@ -9,10 +9,24 @@ description: 当用户明确要求制作包含雨课堂插件功能的 PPT 时�
 
 ## 入口与用法
 
-先按平台选择入口：
+### 在已有课件中插入题页（Windows 和 macOS）
 
-- **macOS**：创建脚本 `scripts/create_deck.py` 和下文的插入、编辑示例使用桌面版 PowerPoint、AppleScript 和已加载的雨课堂插件。主要插题宏是 `Message.InsertProb`。
-- **Windows**：可用 Python 3 运行 `scripts/inspect_deck.py` 检查已保存的课件。本技能尚未提供适用于 Windows 的原生插题脚本。
+从技能目录运行以下命令（Windows 的 Python 启动器可用 `py -3`）。脚本使用 Python 3 标准库直接生成新的 PPTX。
+
+```bash
+python3 scripts/insert_questions.py "基础稿.pptx" "插题清单.json" "交付稿.pptx"
+```
+
+按[插题清单示例](references/insertion-plan.json)填写。每项的 `after` 指原稿页码，从 1 开始。同一页后的多道题按清单顺序插入。支持 PowerPoint 标准宽屏（13⅓ × 7½ 英寸），每题四个选项。
+
+- `choice` 插入 2 分单选题，`answer` 为 A 到 D 中的一个，`remark` 为可选解析。
+- `poll` 插入匿名投票，`limit` 为最多可选项数（1 到 4）。
+
+保存后用 `scripts/inspect_deck.py` 对照清单核对页序、文字和标签。
+
+### 通过雨课堂插件创建和编辑（macOS）
+
+其他题型、题目编辑和页内互动使用已加载雨课堂插件的桌面版 PowerPoint。主要插题宏是 `Message.InsertProb`。
 
 ```applescript
 tell application "Microsoft PowerPoint"
@@ -30,7 +44,7 @@ end tell
 - 修改既有课件，按参考文档调用 `Message.EditProblem` 定位题目，再调用相应编辑宏。
 - 在 WorkBuddy 中调用 PowerPoint 报权限错误时，阅读 [故障排查](references/troubleshooting.md)。
 
-## 执行要点
+## 插件宏的执行要点
 
 1. 从当前 PowerPoint 查询实际加载的雨课堂插件及其位置，检查客户端连接。发现方法、实测版本和接口适配方法见参考文档第 6 节。
 2. 调用前确认活动文稿完整路径和目标页。另存为后按新名称重新获取文稿引用；向前插页后重新定位后续目标，避免页码偏移。
